@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     JIRA_USERNAME: str = "your_jira_username_here"
     JIRA_API_TOKEN: str = "your_jira_api_token_here"
     
+    # File Upload
+    UPLOAD_DIR: str = "uploads"
+    
     # CORS Configuration
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
@@ -26,7 +29,4 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
-settings = Settings()
-
-# Create upload directory if it doesn't exist
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True) 
+settings = Settings() 

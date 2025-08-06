@@ -7,6 +7,21 @@ from app.routers.test_generation import router as test_generation_router
 from app.routers.script_output import router as script_output_router
 from app.routers.manual_testing import router as manual_testing_router
 from app.core.config import settings
+from app.core.database import create_tables
+
+# Create upload directory if it doesn't exist
+try:
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    print(f"Upload directory '{settings.UPLOAD_DIR}' ready")
+except Exception as e:
+    print(f"Upload directory setup warning: {e}")
+
+# Create database tables on startup
+try:
+    create_tables()
+    print("Database tables created successfully")
+except Exception as e:
+    print(f"Database setup warning: {e}")
 
 app = FastAPI(
     title="Scriptodon Test Automation Platform",
@@ -41,6 +56,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     host = os.environ.get("HOST", "0.0.0.0")
     
+    print(f"Starting Scriptodon API on {host}:{port}")
     try:
         uvicorn.run(app, host=host, port=port)
     except OSError:
