@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import json
 import os
-import yaml
 
 from app.core.database import get_db
 from app.schemas.input_source import InputSourceCreate, InputSourceResponse, InputSourceType
