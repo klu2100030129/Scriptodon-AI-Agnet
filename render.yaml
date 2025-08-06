@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: scritodon-backend
+    env: python
+    plan: free
+    buildCommand: |
+      cd backend
+      pip install -r requirements.txt
+      playwright install
+    startCommand: |
+      cd backend
+      python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.7
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_SITE_URL
+        value: https://scritodon-backend.onrender.com
+      - key: OPENROUTER_SITE_NAME
+        value: Scriptodon Test Automation Platform
+      - key: JIRA_SERVER_URL
+        sync: false
+      - key: JIRA_USERNAME
+        sync: false
+      - key: JIRA_API_TOKEN
+        sync: false 

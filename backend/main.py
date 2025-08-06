@@ -37,8 +37,12 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
+    # Get port from environment variable (for Render deployment)
+    port = int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "0.0.0.0")
+    
     try:
-        uvicorn.run(app, host="127.0.0.1", port=8000)
+        uvicorn.run(app, host=host, port=port)
     except OSError:
-        print("Port 8000 is busy, trying port 8001...")
-        uvicorn.run(app, host="127.0.0.1", port=8001) 
+        print(f"Port {port} is busy, trying port {port + 1}...")
+        uvicorn.run(app, host=host, port=port + 1) 
