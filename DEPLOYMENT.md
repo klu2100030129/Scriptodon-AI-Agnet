@@ -43,7 +43,7 @@ JIRA_API_TOKEN=your-jira-token
 
 ### Common Issues:
 
-1. **Rust/Cargo Errors**: Fixed by using `requirements-deploy.txt` which excludes Rust-dependent packages
+1. **Rust/Cargo Errors**: Fixed by using ultra-minimal `requirements-deploy.txt`
 2. **Port Issues**: Fixed by using environment variables for host/port
 3. **Database Issues**: SQLite database will be created automatically
 
@@ -76,12 +76,29 @@ If deployment fails, check the build logs in Render dashboard for specific error
 ## Package Differences
 
 ### Development vs Deployment
-- **Development**: Uses `requirements.txt` with all packages including Playwright
-- **Deployment**: Uses `requirements-deploy.txt` without Rust-dependent packages
+- **Development**: Uses `requirements.txt` with all packages
+- **Deployment**: Uses `requirements-deploy.txt` with minimal packages
+
+### Minimal Deployment Packages
+```
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+sqlalchemy==2.0.23
+requests==2.31.0
+aiohttp==3.9.1
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+jinja2==3.1.2
+PyYAML==6.0.1
+```
 
 ### Removed for Deployment
-- `python-jose[cryptography]` - Replaced with `python-jose` (no extras)
-- `passlib[bcrypt]` - Replaced with `passlib` (no extras)
-- `playwright` - Can be installed separately if needed
+- `uvicorn[standard]` → `uvicorn` (no extras)
+- `aiofiles` - Not used in core functionality
+- `pytest` - Can be added back if needed for testing
+- `selenium` - Can be added back if needed for browser automation
+- `playwright` - Can be added back if needed for browser automation
 
-This ensures successful deployment without Rust compilation errors. 
+This ultra-minimal configuration ensures successful deployment without any Rust compilation errors. 
