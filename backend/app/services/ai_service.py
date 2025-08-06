@@ -2,8 +2,6 @@ import requests
 import json
 from app.core.config import settings
 from typing import List, Dict, Any, Optional
-import asyncio
-import aiohttp
 import logging
 
 # Configure logging to avoid exposing sensitive data
@@ -34,7 +32,7 @@ class AIService:
         self._validate_api_key()
         
         try:
-            response = await self._make_openrouter_request_with_messages(messages, model)
+            response = self._make_openrouter_request_with_messages(messages, model)
             return response
         except Exception as e:
             # Don't expose API key in error messages
@@ -47,7 +45,7 @@ class AIService:
         prompt = self._build_test_case_prompt(input_content, source_type)
         
         try:
-            response = await self._make_openrouter_request(prompt)
+            response = self._make_openrouter_request(prompt)
             return self._parse_test_cases_response(response)
         except Exception as e:
             logger.error(f"Error generating test cases: {str(e)}")
@@ -69,9 +67,9 @@ class AIService:
             logger.error(f"Error generating automation script: {str(e)}")
             raise Exception(f"Error generating automation script: {str(e)}")
 
-    async def _make_openrouter_request_with_messages(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> str:
+    def _make_openrouter_request_with_messages(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> str:
         """
-        Make request to OpenRouter API with custom messages using aiohttp for better async performance
+        Make request to OpenRouter API with custom messages using requests
         Follows the exact pattern provided by OpenRouter
         """
         headers = {
@@ -87,18 +85,18 @@ class AIService:
         }
         
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    url=self.base_url,
-                    headers=headers,
-                    json=data
-                ) as response:
-                    return await self._handle_openrouter_response_async(response)
-        except aiohttp.ClientError as e:
+            response = requests.post(
+                url=self.base_url,
+                headers=headers,
+                json=data
+            )
+            
+            return self._handle_openrouter_response(response)
+        except requests.exceptions.RequestException as e:
             logger.error(f"OpenRouter API request failed: {str(e)}")
             raise Exception(f"OpenRouter API request failed: {str(e)}")
 
-    async def _make_openrouter_request(self, prompt: str) -> str:
+    def _make_openrouter_request(self, prompt: str) -> str:
         """
         Make request to OpenRouter API following the exact pattern provided
         """
@@ -120,46 +118,20 @@ class AIService:
         }
         
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    url=self.base_url,
-                    headers=headers,
-                    json=data
-                ) as response:
-                    return await self._handle_openrouter_response_async(response)
-        except aiohttp.ClientError as e:
+            response = requests.post(
+                url=self.base_url,
+                headers=headers,
+                json=data
+            )
+            
+            return self._handle_openrouter_response(response)
+        except requests.exceptions.RequestException as e:
             logger.error(f"OpenRouter API request failed: {str(e)}")
             raise Exception(f"OpenRouter API request failed: {str(e)}")
 
-    async def _handle_openrouter_response_async(self, response: aiohttp.ClientResponse) -> str:
-        """
-        Handle OpenRouter API response with proper error handling (async version)
-        """
-        if response.status == 401:
-            raise Exception("OpenRouter API key is invalid or expired. Please check your API key at https://openrouter.ai/keys")
-        elif response.status == 403:
-            raise Exception("OpenRouter API access denied. Please check your account status and credits.")
-        elif response.status == 429:
-            raise Exception("OpenRouter API rate limit exceeded. Please try again later.")
-        elif not response.ok:
-            error_text = await response.text()
-            # Don't log the full error response to avoid exposing sensitive data
-            logger.error(f"OpenRouter API request failed with status {response.status}")
-            raise Exception(f"OpenRouter API request failed with status {response.status}")
-        
-        try:
-            result = await response.json()
-            return result['choices'][0]['message']['content']
-        except KeyError as e:
-            logger.error(f"Unexpected response format from OpenRouter: {str(e)}")
-            raise Exception(f"Unexpected response format from OpenRouter: {str(e)}")
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON response from OpenRouter: {str(e)}")
-            raise Exception(f"Invalid JSON response from OpenRouter: {str(e)}")
-
     def _handle_openrouter_response(self, response: requests.Response) -> str:
         """
-        Handle OpenRouter API response with proper error handling (sync version for backward compatibility)
+        Handle OpenRouter API response with proper error handling
         """
         if response.status_code == 401:
             raise Exception("OpenRouter API key is invalid or expired. Please check your API key at https://openrouter.ai/keys")
