@@ -4,6 +4,11 @@ from app.core.config import settings
 from typing import List, Dict, Any, Optional
 import asyncio
 import aiohttp
+import logging
+
+# Configure logging to avoid exposing sensitive data
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class AIService:
     def __init__(self):
@@ -13,22 +18,31 @@ class AIService:
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
         self.model = "qwen/qwen-2.5-72b-instruct:free"  # Using the new OpenRouter model
 
+    def _validate_api_key(self):
+        """Validate API key without exposing it in error messages"""
+        if not self.api_key or self.api_key == "your_openrouter_api_key_here":
+            raise Exception("OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your .env file. Get your API key from https://openrouter.ai/keys")
+        
+        # Validate API key format (should start with sk-or-v1-)
+        if not self.api_key.startswith("sk-or-v1-"):
+            raise Exception("Invalid OpenRouter API key format. API key should start with 'sk-or-v1-'")
+
     async def chat_completion(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> str:
         """
         General chat completion method for any conversation
         """
-        if not self.api_key or self.api_key == "your_openrouter_api_key_here":
-            raise Exception("OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your .env file. Get your API key from https://openrouter.ai/keys")
+        self._validate_api_key()
         
         try:
             response = await self._make_openrouter_request_with_messages(messages, model)
             return response
         except Exception as e:
+            # Don't expose API key in error messages
+            logger.error(f"Error in chat completion: {str(e)}")
             raise Exception(f"Error in chat completion: {str(e)}")
 
     async def generate_test_cases(self, input_content: str, source_type: str) -> List[Dict[str, Any]]:
-        if not self.api_key or self.api_key == "your_openrouter_api_key_here":
-            raise Exception("OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your .env file. Get your API key from https://openrouter.ai/keys")
+        self._validate_api_key()
         
         prompt = self._build_test_case_prompt(input_content, source_type)
         
@@ -36,6 +50,7 @@ class AIService:
             response = await self._make_openrouter_request(prompt)
             return self._parse_test_cases_response(response)
         except Exception as e:
+            logger.error(f"Error generating test cases: {str(e)}")
             raise Exception(f"Error generating test cases: {str(e)}")
 
     async def generate_automation_script(self, test_cases: List[Dict], script_type: str) -> str:
@@ -51,11 +66,13 @@ class AIService:
             script_content = generate_script_content(test_cases, script_type)
             return script_content
         except Exception as e:
+            logger.error(f"Error generating automation script: {str(e)}")
             raise Exception(f"Error generating automation script: {str(e)}")
 
     async def _make_openrouter_request_with_messages(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> str:
         """
         Make request to OpenRouter API with custom messages using aiohttp for better async performance
+        Follows the exact pattern provided by OpenRouter
         """
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -78,9 +95,13 @@ class AIService:
                 ) as response:
                     return await self._handle_openrouter_response_async(response)
         except aiohttp.ClientError as e:
+            logger.error(f"OpenRouter API request failed: {str(e)}")
             raise Exception(f"OpenRouter API request failed: {str(e)}")
 
     async def _make_openrouter_request(self, prompt: str) -> str:
+        """
+        Make request to OpenRouter API following the exact pattern provided
+        """
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -107,6 +128,7 @@ class AIService:
                 ) as response:
                     return await self._handle_openrouter_response_async(response)
         except aiohttp.ClientError as e:
+            logger.error(f"OpenRouter API request failed: {str(e)}")
             raise Exception(f"OpenRouter API request failed: {str(e)}")
 
     async def _handle_openrouter_response_async(self, response: aiohttp.ClientResponse) -> str:
@@ -121,14 +143,18 @@ class AIService:
             raise Exception("OpenRouter API rate limit exceeded. Please try again later.")
         elif not response.ok:
             error_text = await response.text()
-            raise Exception(f"OpenRouter API request failed with status {response.status}: {error_text}")
+            # Don't log the full error response to avoid exposing sensitive data
+            logger.error(f"OpenRouter API request failed with status {response.status}")
+            raise Exception(f"OpenRouter API request failed with status {response.status}")
         
         try:
             result = await response.json()
             return result['choices'][0]['message']['content']
         except KeyError as e:
+            logger.error(f"Unexpected response format from OpenRouter: {str(e)}")
             raise Exception(f"Unexpected response format from OpenRouter: {str(e)}")
         except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON response from OpenRouter: {str(e)}")
             raise Exception(f"Invalid JSON response from OpenRouter: {str(e)}")
 
     def _handle_openrouter_response(self, response: requests.Response) -> str:
@@ -142,14 +168,18 @@ class AIService:
         elif response.status_code == 429:
             raise Exception("OpenRouter API rate limit exceeded. Please try again later.")
         elif not response.ok:
-            raise Exception(f"OpenRouter API request failed with status {response.status_code}: {response.text}")
+            # Don't log the full error response to avoid exposing sensitive data
+            logger.error(f"OpenRouter API request failed with status {response.status_code}")
+            raise Exception(f"OpenRouter API request failed with status {response.status_code}")
         
         try:
             result = response.json()
             return result['choices'][0]['message']['content']
         except KeyError as e:
+            logger.error(f"Unexpected response format from OpenRouter: {str(e)}")
             raise Exception(f"Unexpected response format from OpenRouter: {str(e)}")
         except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON response from OpenRouter: {str(e)}")
             raise Exception(f"Invalid JSON response from OpenRouter: {str(e)}")
 
     def _build_test_case_prompt(self, input_content: str, source_type: str) -> str:
