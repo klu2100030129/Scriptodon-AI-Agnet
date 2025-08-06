@@ -18,14 +18,15 @@
 ### 2. Configure the Service
 
 **Build Settings:**
-- **Build Command**: `cd backend && pip install -r requirements-deploy.txt`
-- **Start Command**: `cd backend && python main.py`
+- **Root Directory**: `backend`
+- **Build Command**: `pip install -r requirements-deploy.txt`
+- **Start Command**: `python main.py`
 
 **Environment Variables:**
 Add these environment variables in Render dashboard:
 
 ```
-OPENROUTER_API_KEY=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
+OPENROUTER_API_KEY=your-openrouter-api-key-here
 OPENROUTER_SITE_URL=https://your-app-name.onrender.com
 OPENROUTER_SITE_NAME=Scriptodon Test Automation Platform
 JIRA_SERVER_URL=https://2100030129cse.atlassian.net/
@@ -43,7 +44,7 @@ JIRA_API_TOKEN=your-jira-token
 
 ### Common Issues:
 
-1. **Rust/Cargo Errors**: Fixed by using ultra-minimal `requirements-deploy.txt`
+1. **Rust/Cargo Errors**: Fixed by using pre-compiled packages in `requirements-deploy.txt`
 2. **Port Issues**: Fixed by using environment variables for host/port
 3. **Database Issues**: SQLite database will be created automatically
 
@@ -77,28 +78,25 @@ If deployment fails, check the build logs in Render dashboard for specific error
 
 ### Development vs Deployment
 - **Development**: Uses `requirements.txt` with all packages
-- **Deployment**: Uses `requirements-deploy.txt` with minimal packages
+- **Deployment**: Uses `requirements-deploy.txt` with pre-compiled packages
 
-### Minimal Deployment Packages
+### Pre-compiled Deployment Packages
 ```
-fastapi==0.104.1
-uvicorn==0.24.0
+fastapi==0.88.0
+uvicorn==0.20.0
 python-multipart==0.0.6
-sqlalchemy==2.0.23
-requests==2.31.0
-aiohttp==3.9.1
-python-dotenv==1.0.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
+sqlalchemy==1.4.46
+requests==2.28.1
+aiohttp==3.8.4
+python-dotenv==0.21.1
+pydantic==1.10.2
 jinja2==3.1.2
-PyYAML==6.0.1
+PyYAML==6.0
 ```
 
-### Removed for Deployment
-- `uvicorn[standard]` → `uvicorn` (no extras)
-- `aiofiles` - Not used in core functionality
-- `pytest` - Can be added back if needed for testing
-- `selenium` - Can be added back if needed for browser automation
-- `playwright` - Can be added back if needed for browser automation
+### Key Changes for Deployment
+- **Pydantic v1**: Uses older version that doesn't require Rust compilation
+- **Pre-compiled wheels**: All packages are pre-compiled, no compilation needed
+- **Older but stable versions**: Uses proven versions that work on Render
 
-This ultra-minimal configuration ensures successful deployment without any Rust compilation errors. 
+This configuration uses only pre-compiled packages that don't require any Rust compilation, ensuring successful deployment on Render. 

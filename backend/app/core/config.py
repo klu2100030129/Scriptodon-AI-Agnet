@@ -1,5 +1,5 @@
-from pydantic_settings import BaseSettings
-from typing import Optional
+from pydantic import BaseSettings
+from typing import Optional, List
 import os
 
 class Settings(BaseSettings):
@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Scriptodon Test Automation Platform"
     
     # CORS
-    BACKEND_CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:5173"]
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
     
     # AI API Configuration - OpenRouter
     OPENROUTER_API_KEY: Optional[str] = None
