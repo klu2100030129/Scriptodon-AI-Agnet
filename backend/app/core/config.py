@@ -1,31 +1,27 @@
-from pydantic import BaseSettings
-from typing import Optional, List
+from pydantic_settings import BaseSettings
+from typing import List
 import os
 
 class Settings(BaseSettings):
-    # API Configuration
-    API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "Scriptodon Test Automation Platform"
-    
-    # CORS
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
-    
-    # AI API Configuration - OpenRouter
-    OPENROUTER_API_KEY: Optional[str] = None
-    OPENROUTER_SITE_URL: Optional[str] = "http://localhost:3000"
-    OPENROUTER_SITE_NAME: Optional[str] = "Scriptodon Test Automation Platform"
-    
-    # File Upload
-    UPLOAD_DIR: str = "uploads"
-    MAX_FILE_SIZE: int = 10 * 1024 * 1024  # 10MB
-    
     # Database
     DATABASE_URL: str = "sqlite:///./scritodon.db"
     
+    # OpenRouter API Configuration
+    OPENROUTER_API_KEY: str = "your_openrouter_api_key_here"
+    OPENROUTER_SITE_URL: str = "https://scritodon-backend.onrender.com"
+    OPENROUTER_SITE_NAME: str = "Scriptodon Test Automation Platform"
+    
     # Jira Configuration
-    JIRA_SERVER_URL: Optional[str] = None
-    JIRA_USERNAME: Optional[str] = None
-    JIRA_API_TOKEN: Optional[str] = None
+    JIRA_SERVER_URL: str = "your_jira_server_url_here"
+    JIRA_USERNAME: str = "your_jira_username_here"
+    JIRA_API_TOKEN: str = "your_jira_api_token_here"
+    
+    # CORS Configuration
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://scritodon-frontend.onrender.com"
+    ]
     
     class Config:
         env_file = ".env"
