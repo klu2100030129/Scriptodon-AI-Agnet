@@ -1,17 +1,12 @@
 #!/bin/bash
+echo "Starting build process..."
+echo "Current directory: $(pwd)"
+echo "Installing dependencies from requirements.txt..."
 
-# Build script for Render deployment
-
-echo "Installing Python dependencies..."
+# Upgrade pip
 pip install --upgrade pip
-pip install -r requirements-deploy.txt
 
-echo "Setting up database..."
-python -c "
-from app.core.database import engine
-from app.models import Base
-Base.metadata.create_all(bind=engine)
-print('Database tables created successfully')
-"
+# Install requirements with no cache
+pip install -r requirements.txt --no-cache-dir
 
 echo "Build completed successfully!" 
