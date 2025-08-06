@@ -10,7 +10,7 @@ class AIService:
         self.site_url = settings.OPENROUTER_SITE_URL
         self.site_name = settings.OPENROUTER_SITE_NAME
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
-        self.model = "qwen/qwen-2.5-72b-instruct:free"
+        self.model = "qwen/qwen-2.5-72b-instruct:free"  # Using the new OpenRouter model
 
     async def generate_test_cases(self, input_content: str, source_type: str) -> List[Dict[str, Any]]:
         if not self.api_key or self.api_key == "your_openrouter_api_key_here":

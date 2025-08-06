@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # CORS
     BACKEND_CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:5173"]
     
-    # AI API Configuration
+    # AI API Configuration - OpenRouter
     OPENROUTER_API_KEY: Optional[str] = None
     OPENROUTER_SITE_URL: Optional[str] = "http://localhost:3000"
     OPENROUTER_SITE_NAME: Optional[str] = "Scriptodon Test Automation Platform"
