@@ -4,10 +4,7 @@
 
 echo "Installing Python dependencies..."
 pip install --upgrade pip
-pip install -r requirements.txt
-
-echo "Installing Playwright browsers..."
-playwright install --with-deps
+pip install -r requirements-deploy.txt
 
 echo "Setting up database..."
 python -c "

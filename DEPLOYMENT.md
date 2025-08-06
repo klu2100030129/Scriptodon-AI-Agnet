@@ -18,7 +18,7 @@
 ### 2. Configure the Service
 
 **Build Settings:**
-- **Build Command**: `cd backend && pip install -r requirements.txt && playwright install --with-deps`
+- **Build Command**: `cd backend && pip install -r requirements-deploy.txt`
 - **Start Command**: `cd backend && python main.py`
 
 **Environment Variables:**
@@ -43,7 +43,7 @@ JIRA_API_TOKEN=your-jira-token
 
 ### Common Issues:
 
-1. **Rust/Cargo Errors**: Fixed by removing `[cryptography]` and `[bcrypt]` from requirements
+1. **Rust/Cargo Errors**: Fixed by using `requirements-deploy.txt` which excludes Rust-dependent packages
 2. **Port Issues**: Fixed by using environment variables for host/port
 3. **Database Issues**: SQLite database will be created automatically
 
@@ -71,4 +71,17 @@ If deployment fails, check the build logs in Render dashboard for specific error
 - `POST /api/input-sources/`: Upload input sources
 - `POST /api/test-generation/generate`: Generate test cases
 - `POST /api/script-output/generate`: Generate scripts
-- `POST /api/manual-testing/execute`: Execute manual tests 
+- `POST /api/manual-testing/execute`: Execute manual tests
+
+## Package Differences
+
+### Development vs Deployment
+- **Development**: Uses `requirements.txt` with all packages including Playwright
+- **Deployment**: Uses `requirements-deploy.txt` without Rust-dependent packages
+
+### Removed for Deployment
+- `python-jose[cryptography]` - Replaced with `python-jose` (no extras)
+- `passlib[bcrypt]` - Replaced with `passlib` (no extras)
+- `playwright` - Can be installed separately if needed
+
+This ensures successful deployment without Rust compilation errors. 
