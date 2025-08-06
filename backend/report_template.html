@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Execution Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .summary {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .summary-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        .summary-card.passed {
+            border-left-color: #28a745;
+        }
+        .summary-card.failed {
+            border-left-color: #dc3545;
+        }
+        .summary-card.skipped {
+            border-left-color: #ffc107;
+        }
+        .summary-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .summary-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .passed .summary-number { color: #28a745; }
+        .failed .summary-number { color: #dc3545; }
+        .skipped .summary-number { color: #ffc107; }
+        .total .summary-number { color: #007bff; }
+        
+        .details {
+            padding: 30px;
+        }
+        .test-case {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .test-case-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .test-case.passed .test-case-header {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .test-case.failed .test-case-header {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .test-case.skipped .test-case-header {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        .test-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .test-status.passed {
+            background-color: #28a745;
+            color: white;
+        }
+        .test-status.failed {
+            background-color: #dc3545;
+            color: white;
+        }
+        .test-status.skipped {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .test-case-body {
+            padding: 20px;
+        }
+        .test-info {
+            margin-bottom: 15px;
+        }
+        .test-info h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .test-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .test-steps {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .test-steps h5 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .test-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .test-steps li {
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .error-details {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .error-details h5 {
+            margin: 0 0 10px 0;
+            color: #721c24;
+        }
+        .error-details pre {
+            margin: 0;
+            color: #721c24;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+        .logs {
+            padding: 30px;
+            border-top: 1px solid #eee;
+        }
+        .logs h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+        }
+        .log-content {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Test Execution Report</h1>
+            <p>Generated on {{timestamp}}</p>
+        </div>
+        
+        <div class="summary">
+            <h2>Test Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card total">
+                    <div class="summary-number">{{total_tests}}</div>
+                    <div class="summary-label">Total Tests</div>
+                </div>
+                <div class="summary-card passed">
+                    <div class="summary-number">{{passed_tests}}</div>
+                    <div class="summary-label">Passed</div>
+                </div>
+                <div class="summary-card failed">
+                    <div class="summary-number">{{failed_tests}}</div>
+                    <div class="summary-label">Failed</div>
+                </div>
+                <div class="summary-card skipped">
+                    <div class="summary-number">{{skipped_tests}}</div>
+                    <div class="summary-label">Skipped</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="details">
+            <h2>Detailed Test Results</h2>
+            {{test_cases_html}}
+        </div>
+        
+        <div class="logs">
+            <h3>Execution Logs</h3>
+            <div class="log-content">{{execution_logs}}</div>
+        </div>
+        
+        <div class="footer">
+            <p>Report generated by Scritodon Test Automation Platform</p>
+        </div>
+    </div>
+</body>
+</html> 
