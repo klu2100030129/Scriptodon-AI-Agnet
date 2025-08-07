@@ -6,10 +6,10 @@ echo "Installing dependencies from requirements.txt..."
 # Upgrade pip
 pip install --upgrade pip
 
-# Install greenlet first to avoid compilation issues
-pip install greenlet==3.0.1 --no-cache-dir
+# Install greenlet first with pre-compiled wheel
+pip install greenlet==2.0.2 --only-binary=all --no-cache-dir
 
 # Install requirements with no cache
-pip install -r requirements.txt --no-cache-dir
+pip install -r requirements.txt --only-binary=all --no-cache-dir
 
 echo "Build completed successfully!" 
