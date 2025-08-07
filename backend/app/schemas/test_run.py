@@ -25,4 +25,4 @@ class TestRunResponse(BaseModel):
     results_summary: Optional[str] = None
 
     class Config:
-        from_attributes = True 
+        orm_mode = True 

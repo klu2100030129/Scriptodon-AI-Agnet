@@ -29,4 +29,4 @@ class TestCaseResponse(BaseModel):
     is_automated: bool
 
     class Config:
-        from_attributes = True 
+        orm_mode = True 
